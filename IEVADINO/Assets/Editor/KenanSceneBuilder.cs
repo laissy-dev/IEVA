@@ -17,6 +17,11 @@ public static class KenanSceneBuilder
     const string ChomperModelPath = ChomperFolder + "/Models/Chomper.FBX";
     const string ChomperControllerPath = ChomperFolder + "/Animation/Chompercontroller.controller";
 
+    static readonly Color Rouge = new Color(0.90f, 0.15f, 0.15f);
+    static readonly Color Jaune = new Color(0.95f, 0.80f, 0.10f);
+    static readonly Color Vert = new Color(0.20f, 0.75f, 0.25f);
+    static readonly Color Bleu = new Color(0.15f, 0.35f, 0.90f);
+
     [MenuItem("Kenan/Créer ma scène")]
     public static void CreateKenanScene()
     {
@@ -46,14 +51,27 @@ public static class KenanSceneBuilder
         ConvertChomperMaterialsToURP();
         ReplaceDinoWithChomper(dino);
 
-        CreatePainter("Rouge", new Color(0.90f, 0.15f, 0.15f), new Vector3(-12.0f, 0.0f, 12.0f));
-        CreatePainter("Jaune", new Color(0.95f, 0.80f, 0.10f), new Vector3(12.0f, 0.0f, 12.0f));
-        CreatePainter("Vert", new Color(0.20f, 0.75f, 0.25f), new Vector3(-12.0f, 0.0f, -12.0f));
-        CreatePainter("Bleu", new Color(0.15f, 0.35f, 0.90f), new Vector3(12.0f, 0.0f, -12.0f));
+        CreatePainter("Rouge", Rouge, new Vector3(-12.0f, 0.0f, 12.0f));
+        CreatePainter("Jaune", Jaune, new Vector3(12.0f, 0.0f, 12.0f));
+        CreatePainter("Vert", Vert, new Vector3(-12.0f, 0.0f, -12.0f));
+        CreatePainter("Bleu", Bleu, new Vector3(12.0f, 0.0f, -12.0f));
+
+        CreateZone("Rouge", Rouge, new Vector3(-8.0f, 0.0f, 6.0f), 4.0f, 3.0f);
+        CreateZone("Rouge", Rouge, new Vector3(2.0f, 0.0f, -5.0f), 3.5f, 2.5f);
+        CreateZone("Bleu", Bleu, new Vector3(1.0f, 0.0f, 7.5f), 3.0f, 2.5f);
+        CreateZone("Bleu", Bleu, new Vector3(11.0f, 0.0f, -6.0f), 3.0f, 3.5f);
+        CreateZone("Jaune", Jaune, new Vector3(9.0f, 0.0f, 8.0f), 4.0f, 2.5f);
+        CreateZone("Jaune", Jaune, new Vector3(-6.0f, 0.0f, 0.0f), 3.0f, 2.0f);
+        CreateZone("Vert", Vert, new Vector3(6.0f, 0.0f, 1.0f), 3.5f, 3.0f);
+        CreateZone("Vert", Vert, new Vector3(-8.0f, 0.0f, -6.0f), 4.5f, 3.5f);
 
         if (player.GetComponent<PlayerColor>() == null)
         {
             player.AddComponent<PlayerColor>();
+        }
+        if (player.GetComponent<PlayerHiding>() == null)
+        {
+            player.AddComponent<PlayerHiding>();
         }
 
         BakeNavMesh(scene);
@@ -64,7 +82,7 @@ public static class KenanSceneBuilder
 
         Selection.activeGameObject = player;
         Debug.Log("[Kenan] Scène créée : " + KenanScenePath);
-        EditorUtility.DisplayDialog("Kenan", "Ta scène est prête : " + KenanScenePath + "\n\nAppuie sur Play, approche-toi d'un PNJ de couleur et appuie sur E.", "OK");
+        EditorUtility.DisplayDialog("Kenan", "Ta scène est prête : " + KenanScenePath + "\n\nAppuie sur Play, prends une couleur (E près d'un PNJ) puis va sur une zone de la même couleur.", "OK");
     }
 
     static void ReplaceDinoWithChomper(GameObject dino)
@@ -144,6 +162,21 @@ public static class KenanSceneBuilder
         ColorSource source = npc.AddComponent<ColorSource>();
         source.ColorName = colorName;
         npc.AddComponent<ColorInteraction>();
+    }
+
+    static void CreateZone(string colorName, Color color, Vector3 center, float radiusX, float radiusZ)
+    {
+        GameObject zone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        zone.name = "Zone_" + colorName;
+        zone.transform.position = center + new Vector3(0.0f, 0.025f, 0.0f);
+        zone.transform.localScale = new Vector3(radiusX * 2.0f, 0.025f, radiusZ * 2.0f);
+        zone.GetComponent<MeshRenderer>().sharedMaterial = GetOrCreateColorMaterial(colorName, color);
+
+        RemoveComponent<Collider>(zone);
+        zone.AddComponent<MeshCollider>().sharedMesh = zone.GetComponent<MeshFilter>().sharedMesh;
+
+        ColorSource source = zone.AddComponent<ColorSource>();
+        source.ColorName = colorName;
     }
 
     static Material GetOrCreateColorMaterial(string colorName, Color color)

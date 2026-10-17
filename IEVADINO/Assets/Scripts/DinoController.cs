@@ -7,17 +7,29 @@ public class DinoController : MonoBehaviour
     public Transform Target;
 
     private NavMeshAgent navMeshAgent;
+    private PlayerHiding targetHiding;
 
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        if (Target != null)
+        {
+            targetHiding = Target.GetComponent<PlayerHiding>();
+        }
     }
 
     void Update()
     {
         if (Target != null)
         {
-            navMeshAgent.SetDestination(Target.position);
+            if (targetHiding != null && targetHiding.IsHidden)
+            {
+                navMeshAgent.ResetPath();
+            }
+            else
+            {
+                navMeshAgent.SetDestination(Target.position);
+            }
         }
     }
 }
