@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 public static class KenanSceneBuilder
 {
-    const string SourceScenePath = "Assets/Scenes/Arena.unity";
+    const string SourceScenePath = "Assets/Scenes/Alexandre.unity";
     const string KenanScenePath = "Assets/Scenes/Kenan.unity";
     const string KenanSceneFolder = "Assets/Scenes/Kenan";
     const string ColorMaterialsFolder = "Assets/Materials/Couleurs";
@@ -26,7 +26,7 @@ public static class KenanSceneBuilder
     public static void CreateKenanScene()
     {
         if (AssetDatabase.LoadAssetAtPath<SceneAsset>(KenanScenePath) != null &&
-            !EditorUtility.DisplayDialog("Kenan", "La scène Kenan existe déjà.\nLa recréer à partir de l'Arena d'Alexandre ?\n(les modifications faites dans Kenan.unity seront perdues)", "Recréer", "Annuler"))
+            !EditorUtility.DisplayDialog("Kenan", "La scène Kenan existe déjà.\nLa recréer à partir de la scène d'Alexandre ?\n(les modifications faites dans Kenan.unity seront perdues)", "Recréer", "Annuler"))
         {
             return;
         }
