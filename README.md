@@ -40,7 +40,7 @@ Utilisation des scripts du TP d'intro (`PlayerController`, `SingleAgentControlle
 
 ```mermaid
 gantt
-    title Projet IEVA : Extinction (12 → 25 octobre)
+    title Projet IEVA : Extinction (12 → 23 octobre)
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
 
@@ -61,18 +61,18 @@ gantt
     Prototype jouable                            :milestone, m1, 2026-10-18, 0d
 
     section Semaine 2 : gameplay complet
-    Animator dino : Patrouille / Poursuite       :b1, 2026-10-19, 2d
-    Switch entre les 5 survivants (Tab)          :b2, 2026-10-19, 2d
-    Survivant attrapé + défaite (0 survivant)    :b3, 2026-10-21, 1d
-    Menu principal + écrans victoire / défaite   :b4, 2026-10-21, 1d
-    Dialogue « Oui » des PNJ (Forrest Gump)      :b5, 2026-10-22, 1d
-    Animations d'ambiance (World is Alive)       :b6, 2026-10-22, 1d
-    Sons + éclairage statique / dynamique        :b7, 2026-10-23, 1d
-    Playtest + équilibrage                       :b8, 2026-10-23, 1d
+    Animator dino : Patrouille / Poursuite       :b1, 2026-10-19, 1d
+    Switch entre les 5 survivants (Tab)          :b2, 2026-10-19, 1d
+    Survivant attrapé + défaite (0 survivant)    :b3, 2026-10-20, 1d
+    Menu principal + écrans victoire / défaite   :b4, 2026-10-20, 1d
+    Dialogue « Oui » des PNJ (Forrest Gump)      :b5, 2026-10-21, 1d
+    Animations d'ambiance (World is Alive)       :b6, 2026-10-21, 1d
+    Sons + éclairage statique / dynamique        :b7, 2026-10-21, 1d
+    Playtest + équilibrage                       :b8, 2026-10-22, 1d
 
     section Rendu
-    Build final .exe                             :c1, 2026-10-24, 1d
-    README (choix de gameplay et techniques)     :c2, 2026-10-24, 1d
-    Slides + répétition présentation (10 min)    :c3, 2026-10-24, 2d
-    Rendu                                        :milestone, m2, 2026-10-25, 0d
+    Build final .exe                             :c1, 2026-10-22, 1d
+    README (choix de gameplay et techniques)     :c2, 2026-10-22, 1d
+    Slides + répétition présentation (10 min)    :c3, 2026-10-22, 1d
+    Rendu (vendredi)                             :milestone, m2, 2026-10-23, 0d
 ```
