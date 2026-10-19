@@ -1,20 +1,25 @@
+using System;
 using UnityEngine;
 
 public class PlayerColor : MonoBehaviour
 {
-    public Color CurrentColor = Color.white;
-    public string CurrentColorName = "";
+    public Color NeutralColor = Color.white;
 
-    public void ApplyColor(Color color, string colorName)
+    public ColorData Current { get; private set; }
+
+    public event Action<ColorData> OnColorChanged;
+
+    // null = retour à la couleur neutre.
+    public void ApplyColor(ColorData data)
     {
-        CurrentColor = color;
-        CurrentColorName = colorName;
+        Current = data;
+        Color color = data != null ? data.Color : NeutralColor;
 
         foreach (MeshRenderer part in GetComponentsInChildren<MeshRenderer>())
         {
             part.material.color = color;
         }
 
-        Debug.Log(name + " a pris la couleur " + colorName);
+        OnColorChanged?.Invoke(data);
     }
 }

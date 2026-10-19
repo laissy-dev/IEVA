@@ -12,6 +12,7 @@ public static class KenanSceneBuilder
     const string KenanScenePath = "Assets/Scenes/Kenan.unity";
     const string KenanSceneFolder = "Assets/Scenes/Kenan";
     const string ColorMaterialsFolder = "Assets/Materials/Couleurs";
+    const string ColorDataFolder = "Assets/Data/Couleurs";
 
     const string ChomperFolder = "Assets/Chomper";
     const string ChomperModelPath = ChomperFolder + "/Models/Chomper.FBX";
@@ -32,6 +33,8 @@ public static class KenanSceneBuilder
         }
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
+        PlayerPrefabSetup.Configure();
+
         AssetDatabase.DeleteAsset(KenanScenePath);
         if (!AssetDatabase.CopyAsset(SourceScenePath, KenanScenePath))
         {
@@ -51,28 +54,24 @@ public static class KenanSceneBuilder
         ConvertChomperMaterialsToURP();
         ReplaceDinoWithChomper(dino);
 
-        CreatePainter("Rouge", Rouge, new Vector3(-12.0f, 0.0f, 12.0f));
-        CreatePainter("Jaune", Jaune, new Vector3(12.0f, 0.0f, 12.0f));
-        CreatePainter("Vert", Vert, new Vector3(-12.0f, 0.0f, -12.0f));
-        CreatePainter("Bleu", Bleu, new Vector3(12.0f, 0.0f, -12.0f));
+        ColorData rouge = GetOrCreateColorData("Rouge", Rouge);
+        ColorData jaune = GetOrCreateColorData("Jaune", Jaune);
+        ColorData vert = GetOrCreateColorData("Vert", Vert);
+        ColorData bleu = GetOrCreateColorData("Bleu", Bleu);
 
-        CreateZone("Rouge", Rouge, new Vector3(-8.0f, 0.0f, 6.0f), 4.0f, 3.0f);
-        CreateZone("Rouge", Rouge, new Vector3(2.0f, 0.0f, -5.0f), 3.5f, 2.5f);
-        CreateZone("Bleu", Bleu, new Vector3(1.0f, 0.0f, 7.5f), 3.0f, 2.5f);
-        CreateZone("Bleu", Bleu, new Vector3(11.0f, 0.0f, -6.0f), 3.0f, 3.5f);
-        CreateZone("Jaune", Jaune, new Vector3(9.0f, 0.0f, 8.0f), 4.0f, 2.5f);
-        CreateZone("Jaune", Jaune, new Vector3(-6.0f, 0.0f, 0.0f), 3.0f, 2.0f);
-        CreateZone("Vert", Vert, new Vector3(6.0f, 0.0f, 1.0f), 3.5f, 3.0f);
-        CreateZone("Vert", Vert, new Vector3(-8.0f, 0.0f, -6.0f), 4.5f, 3.5f);
+        CreatePainter(rouge, new Vector3(-12.0f, 0.0f, 12.0f));
+        CreatePainter(jaune, new Vector3(12.0f, 0.0f, 12.0f));
+        CreatePainter(vert, new Vector3(-12.0f, 0.0f, -12.0f));
+        CreatePainter(bleu, new Vector3(12.0f, 0.0f, -12.0f));
 
-        if (player.GetComponent<PlayerColor>() == null)
-        {
-            player.AddComponent<PlayerColor>();
-        }
-        if (player.GetComponent<PlayerHiding>() == null)
-        {
-            player.AddComponent<PlayerHiding>();
-        }
+        CreateZone(rouge, new Vector3(-8.0f, 0.0f, 6.0f), 4.0f, 3.0f);
+        CreateZone(rouge, new Vector3(2.0f, 0.0f, -5.0f), 3.5f, 2.5f);
+        CreateZone(bleu, new Vector3(1.0f, 0.0f, 7.5f), 3.0f, 2.5f);
+        CreateZone(bleu, new Vector3(11.0f, 0.0f, -6.0f), 3.0f, 3.5f);
+        CreateZone(jaune, new Vector3(9.0f, 0.0f, 8.0f), 4.0f, 2.5f);
+        CreateZone(jaune, new Vector3(-6.0f, 0.0f, 0.0f), 3.0f, 2.0f);
+        CreateZone(vert, new Vector3(6.0f, 0.0f, 1.0f), 3.5f, 3.0f);
+        CreateZone(vert, new Vector3(-8.0f, 0.0f, -6.0f), 4.5f, 3.5f);
 
         BakeNavMesh(scene);
 
@@ -143,13 +142,13 @@ public static class KenanSceneBuilder
         EditorUtility.SetDirty(material);
     }
 
-    static void CreatePainter(string colorName, Color color, Vector3 groundPosition)
+    static void CreatePainter(ColorData data, Vector3 groundPosition)
     {
         GameObject npc = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-        npc.name = "PNJ_" + colorName;
+        npc.name = "PNJ_" + data.DisplayName;
         npc.transform.position = groundPosition + Vector3.up;
         npc.transform.LookAt(new Vector3(0.0f, 1.0f, 0.0f));
-        npc.GetComponent<MeshRenderer>().sharedMaterial = GetOrCreateColorMaterial(colorName, color);
+        npc.GetComponent<MeshRenderer>().sharedMaterial = GetOrCreateColorMaterial(data);
 
         SphereCollider interactionZone = npc.AddComponent<SphereCollider>();
         interactionZone.isTrigger = true;
@@ -160,34 +159,56 @@ public static class KenanSceneBuilder
         body.useGravity = false;
 
         ColorSource source = npc.AddComponent<ColorSource>();
-        source.ColorName = colorName;
+        source.Data = data;
         npc.AddComponent<ColorInteraction>();
     }
 
-    static void CreateZone(string colorName, Color color, Vector3 center, float radiusX, float radiusZ)
+    static void CreateZone(ColorData data, Vector3 center, float radiusX, float radiusZ)
     {
         GameObject zone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        zone.name = "Zone_" + colorName;
+        zone.name = "Zone_" + data.DisplayName;
         zone.transform.position = center + new Vector3(0.0f, 0.025f, 0.0f);
         zone.transform.localScale = new Vector3(radiusX * 2.0f, 0.025f, radiusZ * 2.0f);
-        zone.GetComponent<MeshRenderer>().sharedMaterial = GetOrCreateColorMaterial(colorName, color);
-
+        zone.GetComponent<MeshRenderer>().sharedMaterial = GetOrCreateColorMaterial(data);
         RemoveComponent<Collider>(zone);
-        zone.AddComponent<MeshCollider>().sharedMesh = zone.GetComponent<MeshFilter>().sharedMesh;
 
         ColorSource source = zone.AddComponent<ColorSource>();
-        source.ColorName = colorName;
+        source.Data = data;
+        zone.AddComponent<ColorZone>();
+
+        // Trigger plus haut que le disque pour détecter le joueur qui se tient dessus.
+        GameObject detection = new GameObject("Detection");
+        detection.transform.SetParent(zone.transform, false);
+        detection.transform.localScale = new Vector3(1.0f, 40.0f, 1.0f);
+        MeshCollider trigger = detection.AddComponent<MeshCollider>();
+        trigger.sharedMesh = zone.GetComponent<MeshFilter>().sharedMesh;
+        trigger.convex = true;
+        trigger.isTrigger = true;
     }
 
-    static Material GetOrCreateColorMaterial(string colorName, Color color)
+    static ColorData GetOrCreateColorData(string colorName, Color color)
     {
-        string path = ColorMaterialsFolder + "/" + colorName + ".mat";
+        string path = ColorDataFolder + "/" + colorName + ".asset";
+        ColorData data = AssetDatabase.LoadAssetAtPath<ColorData>(path);
+        if (data != null) return data;
+
+        EnsureFolder(ColorDataFolder);
+        data = ScriptableObject.CreateInstance<ColorData>();
+        data.DisplayName = colorName;
+        data.Color = color;
+        AssetDatabase.CreateAsset(data, path);
+        return data;
+    }
+
+    static Material GetOrCreateColorMaterial(ColorData data)
+    {
+        string path = ColorMaterialsFolder + "/" + data.DisplayName + ".mat";
         Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
         if (material != null) return material;
 
         EnsureFolder(ColorMaterialsFolder);
         material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-        material.color = color;
+        material.color = data.Color;
         AssetDatabase.CreateAsset(material, path);
         return material;
     }

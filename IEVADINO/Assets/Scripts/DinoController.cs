@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -5,31 +6,73 @@ using UnityEngine.AI;
 public class DinoController : MonoBehaviour
 {
     public Transform Target;
+    public float RepathInterval = 0.2f;
 
     private NavMeshAgent navMeshAgent;
     private PlayerHiding targetHiding;
+    private Coroutine chase;
 
-    void Start()
+    void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        if (Target != null)
+    }
+
+    void OnEnable()
+    {
+        if (Target == null) return;
+
+        targetHiding = Target.GetComponent<PlayerHiding>();
+        if (targetHiding != null)
         {
-            targetHiding = Target.GetComponent<PlayerHiding>();
+            targetHiding.OnHiddenChanged += HandleTargetHidden;
+        }
+        if (targetHiding == null || !targetHiding.IsHidden)
+        {
+            StartChase();
         }
     }
 
-    void Update()
+    void OnDisable()
     {
-        if (Target != null)
+        if (targetHiding != null)
         {
-            if (targetHiding != null && targetHiding.IsHidden)
-            {
-                navMeshAgent.ResetPath();
-            }
-            else
-            {
-                navMeshAgent.SetDestination(Target.position);
-            }
+            targetHiding.OnHiddenChanged -= HandleTargetHidden;
+        }
+        StopChase();
+    }
+
+    void HandleTargetHidden(bool hidden)
+    {
+        if (hidden) StopChase();
+        else StartChase();
+    }
+
+    void StartChase()
+    {
+        if (chase == null) chase = StartCoroutine(Chase());
+    }
+
+    void StopChase()
+    {
+        if (chase != null)
+        {
+            StopCoroutine(chase);
+            chase = null;
+        }
+        if (navMeshAgent.isActiveAndEnabled && navMeshAgent.isOnNavMesh)
+        {
+            navMeshAgent.ResetPath();
+        }
+    }
+
+    // La cible bouge : on recalcule le chemin à intervalle régulier plutôt qu'à chaque frame.
+    IEnumerator Chase()
+    {
+        WaitForSeconds wait = new WaitForSeconds(RepathInterval);
+        while (true)
+        {
+            if (navMeshAgent.isOnNavMesh) navMeshAgent.SetDestination(Target.position);
+            yield return wait;
         }
     }
 }

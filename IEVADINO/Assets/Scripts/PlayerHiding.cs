@@ -1,67 +1,93 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerColor))]
 public class PlayerHiding : MonoBehaviour
 {
     public float HideDuration = 20.0f;
-    public float ColorTolerance = 0.1f;
 
-    public bool IsHidden;
-    public float TimeLeft;
-    public string ZoneUnderFeet = "";
+    public bool IsHidden { get; private set; }
+    public float TimeLeft { get; private set; }
+
+    public event Action<bool> OnHiddenChanged;
 
     private PlayerColor playerColor;
-    private Color lastColor;
+    private readonly TriggerSet<ColorZone> zones = new TriggerSet<ColorZone>();
+    private Coroutine countdown;
 
-    void Start()
+    void Awake()
     {
         playerColor = GetComponent<PlayerColor>();
-        lastColor = playerColor.CurrentColor;
     }
 
-    void Update()
+    void OnEnable()
     {
-        if (playerColor.CurrentColor != lastColor)
+        playerColor.OnColorChanged += HandleColorChanged;
+    }
+
+    void OnDisable()
+    {
+        playerColor.OnColorChanged -= HandleColorChanged;
+    }
+
+    void HandleColorChanged(ColorData color)
+    {
+        TimeLeft = color != null ? HideDuration : 0.0f;
+        RefreshHidden();
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        ColorZone zone = other.GetComponentInParent<ColorZone>();
+        if (zone != null && zones.Add(zone)) RefreshHidden();
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        ColorZone zone = other.GetComponentInParent<ColorZone>();
+        if (zone != null && zones.Remove(zone)) RefreshHidden();
+    }
+
+    void RefreshHidden()
+    {
+        bool hidden = TimeLeft > 0.0f && IsOnZoneOfColor(playerColor.Current);
+        if (hidden == IsHidden) return;
+
+        IsHidden = hidden;
+        if (hidden)
         {
-            lastColor = playerColor.CurrentColor;
-            TimeLeft = playerColor.CurrentColorName == "" ? 0.0f : HideDuration;
+            countdown = StartCoroutine(Countdown());
         }
-
-        ColorSource zone = FindZoneUnderFeet();
-        ZoneUnderFeet = zone != null ? zone.ColorName : "";
-
-        IsHidden = zone != null && TimeLeft > 0.0f && SameColor(zone.GetColor(), playerColor.CurrentColor);
-
-        if (IsHidden)
+        else if (countdown != null)
         {
+            StopCoroutine(countdown);
+            countdown = null;
+        }
+        OnHiddenChanged?.Invoke(hidden);
+    }
+
+    bool IsOnZoneOfColor(ColorData color)
+    {
+        if (color == null) return false;
+        foreach (ColorZone zone in zones.Items)
+        {
+            if (zone.Data == color) return true;
+        }
+        return false;
+    }
+
+    // Le temps de camouflage ne s'écoule que lorsque le joueur est caché.
+    IEnumerator Countdown()
+    {
+        while (TimeLeft > 0.0f)
+        {
+            yield return null;
             TimeLeft -= Time.deltaTime;
-            if (TimeLeft <= 0.0f)
-            {
-                TimeLeft = 0.0f;
-                IsHidden = false;
-                playerColor.ApplyColor(Color.white, "");
-            }
         }
-    }
-
-    ColorSource FindZoneUnderFeet()
-    {
-        Vector3 origin = transform.position + Vector3.up;
-        Debug.DrawRay(origin, Vector3.down * 3.0f, Color.magenta);
-
-        foreach (RaycastHit hit in Physics.RaycastAll(origin, Vector3.down, 3.0f, ~0, QueryTriggerInteraction.Ignore))
-        {
-            ColorSource source = hit.collider.GetComponent<ColorSource>();
-            if (source != null) return source;
-        }
-        return null;
-    }
-
-    bool SameColor(Color a, Color b)
-    {
-        Vector3 rgbA = new Vector3(a.r, a.g, a.b);
-        Vector3 rgbB = new Vector3(b.r, b.g, b.b);
-        return Vector3.Distance(rgbA, rgbB) < ColorTolerance;
+        TimeLeft = 0.0f;
+        countdown = null;
+        playerColor.ApplyColor(null);
     }
 
     void OnGUI()
