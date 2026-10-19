@@ -25,14 +25,14 @@ Utilisation des scripts du TP d'intro (`PlayerController`, `SingleAgentControlle
 - [x] Projet Unity commun `IEVADINO` (Unity 6, URP) + `.gitignore`
 - [x] Player Controller : `PlayerController.cs` du TP, sur le prefab du bonhomme vert du TP
 - [x] PNJ dinosaure : cylindre + NavMeshAgent + `DinoController.cs` (repris de `SingleAgentController`), NavMeshSurface sur le sol
-- [ ] Ramasser un objet pour gagner
-- [ ] Récupérer le RGB d'un material
-- [ ] Interaction (touche + collider)
-- [ ] Appliquer la couleur au personnage
-- [ ] Placer les PNJ / objets qui donnent les couleurs
-- [ ] Script caché (20 s)
-- [ ] Animator / machine à états du dinosaure
-- [ ] Scripts perdre et gagner
+- [x] Ramasser un objet pour gagner : `Antidote.cs` (15/10)
+- [x] Récupérer le RGB d'un material : `ColorSource.cs` (13/10)
+- [x] Interaction (touche + collider) : `ColorInteraction.cs`, touche E (13/10)
+- [x] Appliquer la couleur au personnage : `PlayerColor.cs` (13/10)
+- [x] Placer les PNJ / objets qui donnent les couleurs : 4 PNJ peintres (13/10) + 8 zones de couleur (17/10)
+- [x] Script caché (20 s) : `PlayerHiding.cs` (17/10)
+- [ ] Animator / machine à états du dinosaure (fait : Chomper + anim marche/idle `DinoAnimation.cs` ; reste : patrouille / poursuite)
+- [ ] Scripts perdre et gagner (fait : gagner ; reste : perdre)
 
 
 
@@ -44,24 +44,28 @@ gantt
     dateFormat YYYY-MM-DD
     axisFormat %d/%m
 
-    section Mise en place (fait le 12/10)
+    section Mise en place (12-13/10)
     Projet Unity commun, .gitignore, GitHub      :done, a0, 2026-10-12, 1d
     Arène vide (sol + NavMeshSurface)            :done, a1, 2026-10-12, 1d
+    README + Gantt                               :done, a11, 2026-10-13, 1d
 
     section Semaine 1 : cœur du jeu
     PlayerController (repris du TP)              :done, a2, 2026-10-12, 1d
     Dinosaure NavMeshAgent qui suit le joueur    :done, a3, 2026-10-12, 1d
-    Ramasser l'antidote → victoire               :a4, 2026-10-13, 2d
-    Script récupération RGB du material          :a5, 2026-10-15, 1d
-    Interaction (touche E + collider trigger)    :a6, 2026-10-15, 2d
-    Appliquer la couleur au personnage           :a7, after a5, 1d
-    Zones de couleur + 4 PNJ peintres            :a8, 2026-10-16, 1d
-    Script camouflage (zone + 20 s)              :a9, 2026-10-17, 2d
-    Premier build .exe Windows (test)            :a10, 2026-10-18, 1d
-    Prototype jouable                            :milestone, m1, 2026-10-18, 0d
+    Script récupération RGB du material          :done, a5, 2026-10-13, 1d
+    Interaction (touche E + collider trigger)    :done, a6, 2026-10-13, 1d
+    Appliquer la couleur au personnage           :done, a7, 2026-10-13, 1d
+    4 PNJ peintres                               :done, a8, 2026-10-13, 1d
+    Chomper (modèle + anim marche/idle)          :done, a12, 2026-10-13, 1d
+    Merge des 2 parties                          :done, a13, 2026-10-15, 1d
+    Ramasser l'antidote → victoire               :done, a4, 2026-10-15, 1d
+    Zones de couleur                             :done, a14, 2026-10-17, 1d
+    Script camouflage (zone + 20 s)              :done, a9, 2026-10-17, 1d
+    Prototype jouable                            :milestone, m1, 2026-10-17, 0d
+    Premier build .exe Windows (reporté)         :crit, a10, 2026-10-20, 1d
 
     section Semaine 2 : gameplay complet
-    Animator dino : Patrouille / Poursuite       :b1, 2026-10-19, 1d
+    Animator dino (Patrouille / Poursuite)       :b1, 2026-10-19, 1d
     Switch entre les 5 survivants (Tab)          :b2, 2026-10-19, 1d
     Survivant attrapé + défaite (0 survivant)    :b3, 2026-10-20, 1d
     Menu principal + écrans victoire / défaite   :b4, 2026-10-20, 1d
