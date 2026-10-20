@@ -69,7 +69,9 @@ public static class AlexandreMapBuilder
         manager.Rules = rules;
         manager.Fragments = fragments.ToArray();
 
-        IgnoreFromNavMesh(FindRootObject(scene, "Dino"));
+        GameObject dino = FindRootObject(scene, "Dino");
+        IgnoreFromNavMesh(dino);
+        SetupDinoCatcher(dino);
     }
 
     static void ResizeGround(Scene scene)
@@ -250,6 +252,18 @@ public static class AlexandreMapBuilder
         Transform group = new GameObject(name).transform;
         group.SetParent(parent, false);
         return group;
+    }
+
+    // Trigger porté par un enfant : le builder de la scène fusionnée retire le collider du dinosaure.
+    static void SetupDinoCatcher(GameObject dino)
+    {
+        if (dino == null || dino.GetComponentInChildren<DinoCatcher>() != null) return;
+
+        GameObject capture = new GameObject("Capture");
+        capture.transform.SetParent(dino.transform, false);
+        capture.transform.localPosition = Vector3.up * 0.5f;
+        capture.AddComponent<Rigidbody>().isKinematic = true;
+        capture.AddComponent<DinoCatcher>();
     }
 
     static void IgnoreFromNavMesh(GameObject target)

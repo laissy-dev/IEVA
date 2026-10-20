@@ -5,6 +5,7 @@ public class GameManager : MonoBehaviour
 {
     public GameRules Rules;
     public AntidoteFragment[] Fragments;
+    public SurvivorManager Survivors;
 
     public int CollectedFragments { get; private set; }
     public bool IsOver { get; private set; }
@@ -20,6 +21,7 @@ public class GameManager : MonoBehaviour
         {
             fragment.OnCollected += HandleFragmentCollected;
         }
+        if (Survivors != null) Survivors.OnAllCaught += HandleAllCaught;
     }
 
     void OnDisable()
@@ -28,6 +30,7 @@ public class GameManager : MonoBehaviour
         {
             fragment.OnCollected -= HandleFragmentCollected;
         }
+        if (Survivors != null) Survivors.OnAllCaught -= HandleAllCaught;
     }
 
     void HandleFragmentCollected(AntidoteFragment fragment)
@@ -40,6 +43,11 @@ public class GameManager : MonoBehaviour
             OnVictory?.Invoke();
             EndGame("Victoire ! Antidote reconstitué");
         }
+    }
+
+    void HandleAllCaught()
+    {
+        EndGame("Défaite ! Tous les survivants ont été attrapés");
     }
 
     void EndGame(string message)

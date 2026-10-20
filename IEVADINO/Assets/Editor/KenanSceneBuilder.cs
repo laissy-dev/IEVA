@@ -78,6 +78,8 @@ public static class KenanSceneBuilder
         }
 
         SurvivorManager survivors = CreateSurvivors(player);
+        GameManager manager = Object.FindFirstObjectByType<GameManager>();
+        if (manager != null) manager.Survivors = survivors;
         SetupCamera(scene, survivors);
         dino.AddComponent<DinoFollowActiveSurvivor>().Survivors = survivors;
 
