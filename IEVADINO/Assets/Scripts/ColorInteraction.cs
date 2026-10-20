@@ -5,6 +5,7 @@ public class ColorInteraction : MonoBehaviour, IInteractable
 {
     private ColorSource colorSource;
 
+    public bool CanInteract => true;
     public string Prompt => "Prendre la couleur " + colorSource.Data.DisplayName;
 
     void Awake()

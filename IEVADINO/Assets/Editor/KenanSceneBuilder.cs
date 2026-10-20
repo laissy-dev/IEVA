@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using Unity.AI.Navigation;
 using UnityEditor;
@@ -64,14 +65,14 @@ public static class KenanSceneBuilder
         CreatePainter(vert, new Vector3(-12.0f, 0.0f, -12.0f));
         CreatePainter(bleu, new Vector3(12.0f, 0.0f, -12.0f));
 
-        CreateZone(rouge, new Vector3(-8.0f, 0.0f, 6.0f), 4.0f, 3.0f);
-        CreateZone(rouge, new Vector3(2.0f, 0.0f, -5.0f), 3.5f, 2.5f);
-        CreateZone(bleu, new Vector3(1.0f, 0.0f, 7.5f), 3.0f, 2.5f);
-        CreateZone(bleu, new Vector3(11.0f, 0.0f, -6.0f), 3.0f, 3.5f);
-        CreateZone(jaune, new Vector3(9.0f, 0.0f, 8.0f), 4.0f, 2.5f);
-        CreateZone(jaune, new Vector3(-6.0f, 0.0f, 0.0f), 3.0f, 2.0f);
-        CreateZone(vert, new Vector3(6.0f, 0.0f, 1.0f), 3.5f, 3.0f);
-        CreateZone(vert, new Vector3(-8.0f, 0.0f, -6.0f), 4.5f, 3.5f);
+        Dictionary<string, ColorData> colors = new Dictionary<string, ColorData>
+        {
+            { "Rouge", rouge }, { "Jaune", jaune }, { "Vert", vert }, { "Bleu", bleu },
+        };
+        foreach (ArenaLayout.ZoneSpot spot in ArenaLayout.Zones)
+        {
+            CreateZone(colors[spot.ColorName], spot.Center, spot.RadiusX, spot.RadiusZ);
+        }
 
         BakeNavMesh(scene);
 

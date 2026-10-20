@@ -15,18 +15,19 @@ public class PlayerController : MonoBehaviour
         body = GetComponent<Rigidbody>();
     }
 
-    // Update ne fait que lire le clavier ; le déplacement physique se fait dans FixedUpdate.
     void Update()
     {
-        translationInput = Input.GetAxis("Vertical");
-        rotationInput = Input.GetAxis("Horizontal");
+        translationInput = Input.GetAxisRaw("Vertical");
+        rotationInput = Input.GetAxisRaw("Horizontal");
     }
 
     void FixedUpdate()
     {
-        Vector3 velocity = transform.forward * translationInput * speed;
+        // transform est interpolé : la direction se lit sur la rotation du Rigidbody.
+        Vector3 velocity = body.rotation * Vector3.forward * translationInput * speed;
         body.linearVelocity = new Vector3(velocity.x, body.linearVelocity.y, velocity.z);
 
+        body.angularVelocity = Vector3.zero;
         Quaternion turn = Quaternion.Euler(0.0f, rotationInput * rotationSpeed * Time.fixedDeltaTime, 0.0f);
         body.MoveRotation(body.rotation * turn);
     }

@@ -26,10 +26,9 @@ public class Interactor : MonoBehaviour
         }
     }
 
-    // Lire une touche impose de tester chaque frame : Update ne sert qu'à ça ici.
     void Update()
     {
-        if (current != null && Input.GetKeyDown(InteractionKey))
+        if (current != null && current.CanInteract && Input.GetKeyDown(InteractionKey))
         {
             current.Interact(gameObject);
         }
@@ -37,7 +36,7 @@ public class Interactor : MonoBehaviour
 
     void OnGUI()
     {
-        if (current == null) return;
+        if (current == null || !current.CanInteract) return;
         GUI.Label(new Rect(20, 20, 500, 30), "[" + InteractionKey + "] " + current.Prompt);
     }
 }

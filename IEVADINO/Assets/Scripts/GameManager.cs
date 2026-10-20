@@ -1,26 +1,45 @@
+using System;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public Antidote Antidote;
+    public GameRules Rules;
+    public AntidoteFragment[] Fragments;
 
+    public int CollectedFragments { get; private set; }
     public bool IsOver { get; private set; }
+
+    public event Action<int> OnFragmentCollected;
+    public event Action OnVictory;
 
     private string endMessage = "";
 
     void OnEnable()
     {
-        if (Antidote != null) Antidote.OnCollected += HandleAntidoteCollected;
+        foreach (AntidoteFragment fragment in Fragments)
+        {
+            fragment.OnCollected += HandleFragmentCollected;
+        }
     }
 
     void OnDisable()
     {
-        if (Antidote != null) Antidote.OnCollected -= HandleAntidoteCollected;
+        foreach (AntidoteFragment fragment in Fragments)
+        {
+            fragment.OnCollected -= HandleFragmentCollected;
+        }
     }
 
-    void HandleAntidoteCollected()
+    void HandleFragmentCollected(AntidoteFragment fragment)
     {
-        EndGame("Victoire ! Antidote récupéré");
+        CollectedFragments++;
+        OnFragmentCollected?.Invoke(CollectedFragments);
+
+        if (CollectedFragments >= Rules.FragmentsToWin)
+        {
+            OnVictory?.Invoke();
+            EndGame("Victoire ! Antidote reconstitué");
+        }
     }
 
     void EndGame(string message)
@@ -33,7 +52,10 @@ public class GameManager : MonoBehaviour
 
     void OnGUI()
     {
-        if (!IsOver) return;
-        GUI.Label(new Rect(20, 80, 500, 30), endMessage);
+        GUI.Label(new Rect(20, 80, 500, 30), "Fragments d'antidote : " + CollectedFragments + " / " + Rules.FragmentsToWin);
+        if (IsOver)
+        {
+            GUI.Label(new Rect(20, 110, 500, 30), endMessage);
+        }
     }
 }

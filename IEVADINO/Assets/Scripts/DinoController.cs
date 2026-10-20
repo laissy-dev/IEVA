@@ -65,7 +65,6 @@ public class DinoController : MonoBehaviour
         }
     }
 
-    // La cible bouge : on recalcule le chemin à intervalle régulier plutôt qu'à chaque frame.
     IEnumerator Chase()
     {
         WaitForSeconds wait = new WaitForSeconds(RepathInterval);
