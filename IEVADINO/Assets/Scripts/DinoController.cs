@@ -9,12 +9,14 @@ public class DinoController : MonoBehaviour
     public float RepathInterval = 0.2f;
 
     private NavMeshAgent navMeshAgent;
-    private PlayerHiding targetHiding;
+    private Survivor targetSurvivor;
     private Coroutine chase;
+    private Vector3 home;
 
     void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        home = transform.position;
     }
 
     void OnEnable()
@@ -45,30 +47,33 @@ public class DinoController : MonoBehaviour
     {
         if (Target == null) return;
 
-        targetHiding = Target.GetComponent<PlayerHiding>();
-        if (targetHiding != null)
+        targetSurvivor = Target.GetComponent<Survivor>();
+        if (targetSurvivor != null)
         {
-            targetHiding.OnHiddenChanged += HandleTargetHidden;
+            targetSurvivor.OnVisibilityChanged += HandleTargetVisibility;
         }
-        if (targetHiding == null || !targetHiding.IsHidden)
-        {
-            StartChase();
-        }
+        HandleTargetVisibility(targetSurvivor == null || targetSurvivor.IsVisible);
     }
 
     void UnwatchTarget()
     {
-        if (targetHiding != null)
+        if (targetSurvivor != null)
         {
-            targetHiding.OnHiddenChanged -= HandleTargetHidden;
+            targetSurvivor.OnVisibilityChanged -= HandleTargetVisibility;
         }
-        targetHiding = null;
+        targetSurvivor = null;
     }
 
-    void HandleTargetHidden(bool hidden)
+    // Cible perdue (cachée ou au refuge) : le dinosaure retourne à son point de départ.
+    void HandleTargetVisibility(bool visible)
     {
-        if (hidden) StopChase();
-        else StartChase();
+        if (visible)
+        {
+            StartChase();
+            return;
+        }
+        StopChase();
+        if (navMeshAgent.isActiveAndEnabled && navMeshAgent.isOnNavMesh) navMeshAgent.SetDestination(home);
     }
 
     void StartChase()

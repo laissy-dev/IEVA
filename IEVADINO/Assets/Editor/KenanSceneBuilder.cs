@@ -14,6 +14,7 @@ public static class KenanSceneBuilder
     const string KenanSceneFolder = "Assets/Scenes/Kenan";
     const string ColorMaterialsFolder = "Assets/Materials/Couleurs";
     const string ColorDataFolder = "Assets/Data/Couleurs";
+    const string DialogueFolder = "Assets/Data/Dialogues";
     const string PlayerPrefabPath = "Assets/Prefabs/Player.prefab";
 
     const string ChomperFolder = "Assets/Chomper";
@@ -220,6 +221,28 @@ public static class KenanSceneBuilder
         ColorSource source = npc.AddComponent<ColorSource>();
         source.Data = data;
         npc.AddComponent<ColorInteraction>();
+        npc.GetComponent<NpcDialogue>().Dialogue = GetOrCreateDialogue(data);
+    }
+
+    static DialogueData GetOrCreateDialogue(ColorData color)
+    {
+        string path = DialogueFolder + "/Peintre_" + color.DisplayName + ".asset";
+        DialogueData dialogue = AssetDatabase.LoadAssetAtPath<DialogueData>(path);
+        if (dialogue != null) return dialogue;
+
+        string colorName = color.DisplayName.ToLower();
+        EnsureFolder(DialogueFolder);
+        dialogue = ScriptableObject.CreateInstance<DialogueData>();
+        dialogue.SpeakerName = "Peintre " + colorName;
+        dialogue.Questions = new[]
+        {
+            "Encore un survivant ! Tu cherches l'antidote, toi aussi ?",
+            "Le dinosaure ne voit pas ceux qui ont la couleur du sol. Tu veux que je te peigne en " + colorName + " ?",
+            "Pour ouvrir un coffre posé sur du " + colorName + ", il faut porter cette couleur. Tu as compris ?",
+            "La peinture ne tient que 20 secondes une fois caché. Tu es prêt ?",
+        };
+        AssetDatabase.CreateAsset(dialogue, path);
+        return dialogue;
     }
 
     static void CreateZone(ColorData data, Vector3 center, float radiusX, float radiusZ)

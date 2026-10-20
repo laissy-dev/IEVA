@@ -16,7 +16,9 @@ public class SurvivorHud : MonoBehaviour
         if (active == null) return;
 
         PlayerHiding hiding = active.Hiding;
-        string state = hiding.IsHidden ? "Caché (" + Mathf.CeilToInt(hiding.TimeLeft) + " s)" : "Visible";
+        string state = active.IsSafe ? "Au refuge"
+            : hiding.IsHidden ? "Caché (" + Mathf.CeilToInt(hiding.TimeLeft) + " s)"
+            : "Visible";
         string text = active.name + " : " + state
             + "   |   Survivants : " + manager.RemainingCount + " / " + manager.Survivors.Length
             + "   [" + manager.SwitchKey + "] changer";

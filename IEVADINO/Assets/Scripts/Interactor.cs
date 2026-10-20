@@ -1,11 +1,19 @@
+using System;
 using UnityEngine;
 
 public class Interactor : MonoBehaviour
 {
     public KeyCode InteractionKey = KeyCode.E;
 
+    public event Action OnDisabled;
+
     private readonly TriggerSet<IInteractable> inRange = new TriggerSet<IInteractable>();
     private IInteractable current;
+
+    void OnDisable()
+    {
+        OnDisabled?.Invoke();
+    }
 
     void OnTriggerEnter(Collider other)
     {
@@ -28,7 +36,7 @@ public class Interactor : MonoBehaviour
 
     void Update()
     {
-        if (current != null && current.CanInteract && Input.GetKeyDown(InteractionKey))
+        if (current != null && current.CanInteract(gameObject) && Input.GetKeyDown(InteractionKey))
         {
             current.Interact(gameObject);
         }
@@ -36,7 +44,12 @@ public class Interactor : MonoBehaviour
 
     void OnGUI()
     {
-        if (current == null || !current.CanInteract) return;
-        GUI.Label(new Rect(20, 20, 500, 30), "[" + InteractionKey + "] " + current.Prompt);
+        if (current == null) return;
+
+        string prompt = current.GetPrompt(gameObject);
+        if (prompt == null) return;
+
+        string key = current.CanInteract(gameObject) ? "[" + InteractionKey + "] " : "";
+        GUI.Label(new Rect(20, 20, 500, 30), key + prompt);
     }
 }

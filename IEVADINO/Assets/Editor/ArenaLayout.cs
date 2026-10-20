@@ -60,13 +60,18 @@ public static class ArenaLayout
         new ObstacleSpot("Muret_Sud", new Vector3(0.0f, 0.6f, -16.9f), new Vector3(18.0f, 1.2f, 0.5f), 0.0f),
     };
 
+    // Refuge hors de l'arène, relié au mur sud par une passerelle.
+    public static readonly Vector3 SpawnCenter = new Vector3(0.0f, 0.0f, -29.0f);
+    public static readonly Vector2 SpawnSize = new Vector2(12.0f, 6.0f);
+    public const float BridgeWidth = 3.0f;
+
     public static readonly Vector3[] SurvivorSpawns =
     {
-        new Vector3(-4.0f, 0.0f, -14.0f),
-        new Vector3(-2.0f, 0.0f, -14.0f),
-        new Vector3(0.0f, 0.0f, -14.0f),
-        new Vector3(2.0f, 0.0f, -14.0f),
-        new Vector3(4.0f, 0.0f, -14.0f),
+        new Vector3(-4.0f, 0.0f, -29.0f),
+        new Vector3(-2.0f, 0.0f, -29.0f),
+        new Vector3(0.0f, 0.0f, -29.0f),
+        new Vector3(2.0f, 0.0f, -29.0f),
+        new Vector3(4.0f, 0.0f, -29.0f),
     };
 
     public static readonly Vector3 DinoSpawn = new Vector3(0.0f, 0.0f, 12.0f);

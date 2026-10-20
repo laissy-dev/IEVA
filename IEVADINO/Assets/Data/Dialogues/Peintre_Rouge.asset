@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a18fef492bf14ed3aaac86def21fede7, type: 3}
+  m_Name: Peintre_Rouge
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  SpeakerName: Peintre rouge
+  Questions:
+  - Encore un survivant ! Tu cherches l'antidote, toi aussi ?
+  - Le dinosaure ne voit pas ceux qui ont la couleur du sol. Tu veux que je te peigne
+    en rouge ?
+  - "Pour ouvrir un coffre pos\xE9 sur du rouge, il faut porter cette couleur. Tu
+    as compris ?"
+  - "La peinture ne tient que 20 secondes une fois cach\xE9. Tu es pr\xEAt ?"
+  Answer: Oui

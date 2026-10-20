@@ -15,8 +15,10 @@ public static class AlexandreMapBuilder
     const string ChestPrefabPath = "Assets/Prefabs/Coffre.prefab";
     const string FragmentPrefabPath = "Assets/Prefabs/FragmentAntidote.prefab";
     const string MapRootName = "Map";
+    const string ColorDataFolder = "Assets/Data/Couleurs";
 
     const float ChestHeight = 0.05f;
+    const int NotWalkableArea = 1;
     const float PlaneSize = 10.0f;
 
     static readonly Color Pierre = new Color(0.45f, 0.43f, 0.40f);
@@ -54,6 +56,7 @@ public static class AlexandreMapBuilder
         Transform map = new GameObject(MapRootName).transform;
         BuildWalls(CreateGroup("Murs", map));
         BuildObstacles(CreateGroup("Obstacles", map));
+        BuildSpawn(CreateGroup("Refuge", map));
         List<Chest> chests = BuildChests(CreateGroup("Coffres", map));
         List<AntidoteFragment> fragments = BuildFragments(CreateGroup("Fragments", map), rules.FragmentsToWin);
 
@@ -68,6 +71,13 @@ public static class AlexandreMapBuilder
         }
         manager.Rules = rules;
         manager.Fragments = fragments.ToArray();
+
+        GameObject player = FindRootObject(scene, "Player");
+        if (player != null)
+        {
+            Vector3 spawn = ArenaLayout.SurvivorSpawns[0];
+            player.transform.position = new Vector3(spawn.x, player.transform.position.y, spawn.z);
+        }
 
         GameObject dino = FindRootObject(scene, "Dino");
         IgnoreFromNavMesh(dino);
@@ -88,7 +98,11 @@ public static class AlexandreMapBuilder
         float length = ArenaLayout.HalfSize * 2.0f + 1.0f;
         float offset = ArenaLayout.HalfSize + 0.25f;
         CreateBlock("Mur_Nord", parent, new Vector3(0.0f, 0.75f, offset), new Vector3(length, 1.5f, 0.5f), 0.0f, Pierre);
-        CreateBlock("Mur_Sud", parent, new Vector3(0.0f, 0.75f, -offset), new Vector3(length, 1.5f, 0.5f), 0.0f, Pierre);
+        // Ouverture du mur sud vers la passerelle du refuge.
+        float segment = (length - ArenaLayout.BridgeWidth) * 0.5f;
+        float segmentCenter = (ArenaLayout.BridgeWidth + segment) * 0.5f;
+        CreateBlock("Mur_Sud_Ouest", parent, new Vector3(-segmentCenter, 0.75f, -offset), new Vector3(segment, 1.5f, 0.5f), 0.0f, Pierre);
+        CreateBlock("Mur_Sud_Est", parent, new Vector3(segmentCenter, 0.75f, -offset), new Vector3(segment, 1.5f, 0.5f), 0.0f, Pierre);
         CreateBlock("Mur_Est", parent, new Vector3(offset, 0.75f, 0.0f), new Vector3(0.5f, 1.5f, length), 0.0f, Pierre);
         CreateBlock("Mur_Ouest", parent, new Vector3(-offset, 0.75f, 0.0f), new Vector3(0.5f, 1.5f, length), 0.0f, Pierre);
     }
@@ -100,6 +114,46 @@ public static class AlexandreMapBuilder
             Color color = spot.Name.StartsWith("Rocher") ? Rocher : Pierre;
             CreateBlock(spot.Name, parent, spot.Position, spot.Size, spot.Yaw, color);
         }
+    }
+
+    static void BuildSpawn(Transform parent)
+    {
+        Vector3 center = ArenaLayout.SpawnCenter;
+        Vector2 size = ArenaLayout.SpawnSize;
+        float bridge = ArenaLayout.BridgeWidth;
+        float wallOuter = ArenaLayout.HalfSize + 0.5f;
+        float spawnNorth = center.z + size.y * 0.5f;
+        float spawnSouth = center.z - size.y * 0.5f;
+        float bridgeLength = -ArenaLayout.HalfSize - spawnNorth;
+        float bridgeCenter = -ArenaLayout.HalfSize - bridgeLength * 0.5f;
+        float railLength = (size.x - bridge) * 0.5f;
+
+        CreateBlock("Plateforme", parent, new Vector3(center.x, -0.25f, center.z), new Vector3(size.x, 0.5f, size.y), 0.0f, Pierre);
+        CreateBlock("Passerelle", parent, new Vector3(0.0f, -0.25f, bridgeCenter), new Vector3(bridge, 0.5f, bridgeLength), 0.0f, Bois);
+
+        CreateBlock("GardeCorps_Sud", parent, new Vector3(center.x, 0.3f, spawnSouth), new Vector3(size.x, 0.6f, 0.2f), 0.0f, Bois);
+        CreateBlock("GardeCorps_Ouest", parent, new Vector3(center.x - size.x * 0.5f, 0.3f, center.z), new Vector3(0.2f, 0.6f, size.y), 0.0f, Bois);
+        CreateBlock("GardeCorps_Est", parent, new Vector3(center.x + size.x * 0.5f, 0.3f, center.z), new Vector3(0.2f, 0.6f, size.y), 0.0f, Bois);
+        CreateBlock("GardeCorps_Nord_Ouest", parent, new Vector3(-(bridge + railLength) * 0.5f, 0.3f, spawnNorth), new Vector3(railLength, 0.6f, 0.2f), 0.0f, Bois);
+        CreateBlock("GardeCorps_Nord_Est", parent, new Vector3((bridge + railLength) * 0.5f, 0.3f, spawnNorth), new Vector3(railLength, 0.6f, 0.2f), 0.0f, Bois);
+
+        float railLengthBridge = -wallOuter - spawnNorth;
+        float railCenterBridge = -wallOuter - railLengthBridge * 0.5f;
+        float railOffset = bridge * 0.5f + 0.1f;
+        CreateBlock("GardeCorps_Passerelle_Ouest", parent, new Vector3(-railOffset, 0.3f, railCenterBridge), new Vector3(0.2f, 0.6f, railLengthBridge), 0.0f, Bois);
+        CreateBlock("GardeCorps_Passerelle_Est", parent, new Vector3(railOffset, 0.3f, railCenterBridge), new Vector3(0.2f, 0.6f, railLengthBridge), 0.0f, Bois);
+
+        GameObject safeZone = new GameObject("ZoneSure");
+        safeZone.transform.SetParent(parent, false);
+        float safeLength = -ArenaLayout.HalfSize - spawnSouth;
+        safeZone.transform.position = new Vector3(center.x, 1.0f, -ArenaLayout.HalfSize - safeLength * 0.5f);
+        safeZone.AddComponent<BoxCollider>().size = new Vector3(size.x, 2.0f, safeLength);
+        safeZone.AddComponent<SafeZone>();
+
+        // Le dinosaure ne peut pas entrer dans le refuge.
+        NavMeshModifier modifier = parent.gameObject.AddComponent<NavMeshModifier>();
+        modifier.overrideArea = true;
+        modifier.area = NotWalkableArea;
     }
 
     static List<Chest> BuildChests(Transform parent)
@@ -114,7 +168,10 @@ public static class AlexandreMapBuilder
             chest.name = "Coffre_" + (i + 1) + "_" + spot.ColorName;
             chest.transform.position = new Vector3(spot.Center.x, ChestHeight, spot.Center.z);
             chest.transform.LookAt(new Vector3(0.0f, ChestHeight, 0.0f));
-            chests.Add(chest.GetComponent<Chest>());
+
+            Chest component = chest.GetComponent<Chest>();
+            component.RequiredColor = AssetDatabase.LoadAssetAtPath<ColorData>(ColorDataFolder + "/" + spot.ColorName + ".asset");
+            chests.Add(component);
         }
         return chests;
     }

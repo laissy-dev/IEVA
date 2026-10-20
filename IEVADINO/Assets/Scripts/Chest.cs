@@ -5,6 +5,7 @@ using UnityEngine;
 public class Chest : MonoBehaviour, IInteractable
 {
     public Transform Lid;
+    public ColorData RequiredColor;
     public float OpenAngle = 110.0f;
     public float OpenDuration = 0.6f;
 
@@ -13,12 +14,26 @@ public class Chest : MonoBehaviour, IInteractable
 
     public event Action<Chest> OnOpened;
 
-    public bool CanInteract => !IsOpen;
-    public string Prompt => "Ouvrir le coffre";
+    public bool CanInteract(GameObject interactor) => !IsOpen && HasRequiredColor(interactor);
+
+    public string GetPrompt(GameObject interactor)
+    {
+        if (IsOpen) return null;
+        if (HasRequiredColor(interactor)) return "Ouvrir le coffre";
+        return "Coffre verrouillé : il faut la couleur " + RequiredColor.DisplayName;
+    }
+
+    bool HasRequiredColor(GameObject interactor)
+    {
+        if (RequiredColor == null) return true;
+
+        PlayerColor playerColor = interactor.GetComponent<PlayerColor>();
+        return playerColor != null && playerColor.Current == RequiredColor;
+    }
 
     public void Interact(GameObject interactor)
     {
-        if (IsOpen) return;
+        if (!CanInteract(interactor)) return;
 
         IsOpen = true;
         OnOpened?.Invoke(this);
