@@ -27,6 +27,7 @@ public static class PlayerPrefabSetup
         GetOrAdd<PlayerColor>(root);
         GetOrAdd<PlayerHiding>(root);
         GetOrAdd<Interactor>(root);
+        GetOrAdd<Survivor>(root);
 
         // Un objet mobile ne doit pas creuser de trou dans le NavMesh.
         GetOrAdd<NavMeshModifier>(root).ignoreFromBuild = true;

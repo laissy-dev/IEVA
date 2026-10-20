@@ -14,6 +14,7 @@ public static class KenanSceneBuilder
     const string KenanSceneFolder = "Assets/Scenes/Kenan";
     const string ColorMaterialsFolder = "Assets/Materials/Couleurs";
     const string ColorDataFolder = "Assets/Data/Couleurs";
+    const string PlayerPrefabPath = "Assets/Prefabs/Player.prefab";
 
     const string ChomperFolder = "Assets/Chomper";
     const string ChomperModelPath = ChomperFolder + "/Models/Chomper.FBX";
@@ -36,8 +37,7 @@ public static class KenanSceneBuilder
 
         PlayerPrefabSetup.Configure();
 
-        AssetDatabase.DeleteAsset(KenanScenePath);
-        if (!AssetDatabase.CopyAsset(SourceScenePath, KenanScenePath))
+        if (!CopySourceScene())
         {
             Debug.LogError("[Kenan] Impossible de copier " + SourceScenePath);
             return;
@@ -52,6 +52,8 @@ public static class KenanSceneBuilder
             return;
         }
 
+        AlexandreMapBuilder.BuildMap(scene);
+
         ConvertChomperMaterialsToURP();
         ReplaceDinoWithChomper(dino);
 
@@ -60,10 +62,11 @@ public static class KenanSceneBuilder
         ColorData vert = GetOrCreateColorData("Vert", Vert);
         ColorData bleu = GetOrCreateColorData("Bleu", Bleu);
 
-        CreatePainter(rouge, new Vector3(-12.0f, 0.0f, 12.0f));
-        CreatePainter(jaune, new Vector3(12.0f, 0.0f, 12.0f));
-        CreatePainter(vert, new Vector3(-12.0f, 0.0f, -12.0f));
-        CreatePainter(bleu, new Vector3(12.0f, 0.0f, -12.0f));
+        float corner = ArenaLayout.PainterCorner;
+        CreatePainter(rouge, new Vector3(-corner, 0.0f, corner));
+        CreatePainter(jaune, new Vector3(corner, 0.0f, corner));
+        CreatePainter(vert, new Vector3(-corner, 0.0f, -corner));
+        CreatePainter(bleu, new Vector3(corner, 0.0f, -corner));
 
         Dictionary<string, ColorData> colors = new Dictionary<string, ColorData>
         {
@@ -74,15 +77,69 @@ public static class KenanSceneBuilder
             CreateZone(colors[spot.ColorName], spot.Center, spot.RadiusX, spot.RadiusZ);
         }
 
+        SurvivorManager survivors = CreateSurvivors(player);
+        SetupCamera(scene, survivors);
+        dino.AddComponent<DinoFollowActiveSurvivor>().Survivors = survivors;
+
         BakeNavMesh(scene);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         AssetDatabase.SaveAssets();
 
-        Selection.activeGameObject = player;
+        Selection.activeGameObject = survivors.gameObject;
         Debug.Log("[Kenan] Scène créée : " + KenanScenePath);
-        EditorUtility.DisplayDialog("Kenan", "Ta scène est prête : " + KenanScenePath + "\n\nAppuie sur Play, prends une couleur (E près d'un PNJ) puis va sur une zone de la même couleur.", "OK");
+        EditorUtility.DisplayDialog("Kenan", "Ta scène est prête : " + KenanScenePath + "\n\nAppuie sur Play : Tab pour changer de survivant, E près d'un PNJ pour prendre sa couleur.", "OK");
+    }
+
+    static bool CopySourceScene()
+    {
+        if (AssetDatabase.LoadAssetAtPath<SceneAsset>(KenanScenePath) == null)
+        {
+            return AssetDatabase.CopyAsset(SourceScenePath, KenanScenePath);
+        }
+
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        File.Copy(SourceScenePath, KenanScenePath, true);
+        AssetDatabase.ImportAsset(KenanScenePath, ImportAssetOptions.ForceUpdate);
+        return true;
+    }
+
+    static SurvivorManager CreateSurvivors(GameObject firstPlayer)
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
+        Transform group = new GameObject("Survivants").transform;
+        float height = firstPlayer.transform.position.y;
+        Vector3 scale = firstPlayer.transform.localScale;
+        Survivor[] survivors = new Survivor[ArenaLayout.SurvivorSpawns.Length];
+
+        for (int i = 0; i < survivors.Length; i++)
+        {
+            GameObject survivor = i == 0 ? firstPlayer : (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            survivor.name = "Survivant_" + (i + 1);
+            survivor.transform.SetParent(group, false);
+            survivor.transform.SetPositionAndRotation(ArenaLayout.SurvivorSpawns[i] + Vector3.up * height, Quaternion.identity);
+            survivor.transform.localScale = scale;
+            survivors[i] = survivor.GetComponent<Survivor>();
+        }
+
+        SurvivorManager manager = group.gameObject.AddComponent<SurvivorManager>();
+        manager.Survivors = survivors;
+        group.gameObject.AddComponent<SurvivorHud>();
+        return manager;
+    }
+
+    static void SetupCamera(Scene scene, SurvivorManager survivors)
+    {
+        GameObject cameraObject = FindRootObject(scene, "Main Camera", false);
+        if (cameraObject == null) return;
+
+        CameraFollow follow = cameraObject.GetComponent<CameraFollow>();
+        if (follow == null) follow = cameraObject.AddComponent<CameraFollow>();
+        follow.Survivors = survivors;
+
+        Vector3 start = survivors.Survivors[0].transform.position;
+        cameraObject.transform.SetPositionAndRotation(start + follow.Offset, Quaternion.LookRotation(-follow.Offset));
     }
 
     static void ReplaceDinoWithChomper(GameObject dino)
@@ -91,8 +148,7 @@ public static class KenanSceneBuilder
         RemoveComponent<MeshFilter>(dino);
         RemoveComponent<Collider>(dino);
 
-        Vector3 position = dino.transform.position;
-        dino.transform.position = new Vector3(position.x, 0.0f, position.z);
+        dino.transform.position = ArenaLayout.DinoSpawn;
         NavMeshAgent agent = dino.GetComponent<NavMeshAgent>();
         agent.baseOffset = 0.0f;
         agent.radius = 1.0f;

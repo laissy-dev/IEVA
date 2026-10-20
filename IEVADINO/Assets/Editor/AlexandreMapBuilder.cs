@@ -16,8 +16,8 @@ public static class AlexandreMapBuilder
     const string FragmentPrefabPath = "Assets/Prefabs/FragmentAntidote.prefab";
     const string MapRootName = "Map";
 
-    const float ArenaHalfSize = 15.0f;
     const float ChestHeight = 0.05f;
+    const float PlaneSize = 10.0f;
 
     static readonly Color Pierre = new Color(0.45f, 0.43f, 0.40f);
     static readonly Color Rocher = new Color(0.35f, 0.32f, 0.28f);
@@ -31,11 +31,25 @@ public static class AlexandreMapBuilder
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
         PlayerPrefabSetup.Configure();
-        GameRules rules = GetOrCreateGameRules();
 
         Scene scene = EditorSceneManager.OpenScene(AlexandreScenePath, OpenSceneMode.Single);
+        BuildMap(scene);
+        BakeNavMesh(scene);
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        AssetDatabase.SaveAssets();
+        Debug.Log("[Alexandre] Scène construite : " + AlexandreScenePath);
+    }
+
+    // Reconstruit la map dans la scène ouverte 
+    public static void BuildMap(Scene scene)
+    {
+        GameRules rules = GetOrCreateGameRules();
+
         DestroyRootObject(scene, MapRootName);
         DestroyRootObject(scene, "Antidote");
+        ResizeGround(scene);
 
         Transform map = new GameObject(MapRootName).transform;
         BuildWalls(CreateGroup("Murs", map));
@@ -56,33 +70,34 @@ public static class AlexandreMapBuilder
         manager.Fragments = fragments.ToArray();
 
         IgnoreFromNavMesh(FindRootObject(scene, "Dino"));
-        BakeNavMesh(scene);
+    }
 
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
-        AssetDatabase.SaveAssets();
-        Debug.Log("[Alexandre] Scène construite : " + AlexandreScenePath);
+    static void ResizeGround(Scene scene)
+    {
+        GameObject ground = FindRootObject(scene, "Ground");
+        if (ground == null) return;
+
+        float scale = ArenaLayout.HalfSize * 2.0f / PlaneSize;
+        ground.transform.localScale = new Vector3(scale, 1.0f, scale);
     }
 
     static void BuildWalls(Transform parent)
     {
-        float length = ArenaHalfSize * 2.0f + 1.0f;
-        float offset = ArenaHalfSize + 0.25f;
+        float length = ArenaLayout.HalfSize * 2.0f + 1.0f;
+        float offset = ArenaLayout.HalfSize + 0.25f;
         CreateBlock("Mur_Nord", parent, new Vector3(0.0f, 0.75f, offset), new Vector3(length, 1.5f, 0.5f), 0.0f, Pierre);
         CreateBlock("Mur_Sud", parent, new Vector3(0.0f, 0.75f, -offset), new Vector3(length, 1.5f, 0.5f), 0.0f, Pierre);
         CreateBlock("Mur_Est", parent, new Vector3(offset, 0.75f, 0.0f), new Vector3(0.5f, 1.5f, length), 0.0f, Pierre);
         CreateBlock("Mur_Ouest", parent, new Vector3(-offset, 0.75f, 0.0f), new Vector3(0.5f, 1.5f, length), 0.0f, Pierre);
     }
 
-    // Placés dans les espaces libres entre les zones de couleur et les PNJ des coins.
     static void BuildObstacles(Transform parent)
     {
-        CreateBlock("Rocher_Centre", parent, new Vector3(-0.3f, 0.75f, 1.3f), new Vector3(2.0f, 1.5f, 2.0f), 15.0f, Rocher);
-        CreateBlock("Rocher_Ouest", parent, new Vector3(-13.0f, 0.6f, 0.5f), new Vector3(1.5f, 1.2f, 2.5f), -10.0f, Rocher);
-        CreateBlock("Rocher_Est", parent, new Vector3(13.0f, 0.6f, 1.5f), new Vector3(1.5f, 1.2f, 2.5f), 10.0f, Rocher);
-
-        CreateBlock("Muret_Nord", parent, new Vector3(0.0f, 0.6f, 11.25f), new Vector3(12.0f, 1.2f, 0.5f), 0.0f, Pierre);
-        CreateBlock("Muret_Sud", parent, new Vector3(0.0f, 0.6f, -11.25f), new Vector3(12.0f, 1.2f, 0.5f), 0.0f, Pierre);
+        foreach (ArenaLayout.ObstacleSpot spot in ArenaLayout.Obstacles)
+        {
+            Color color = spot.Name.StartsWith("Rocher") ? Rocher : Pierre;
+            CreateBlock(spot.Name, parent, spot.Position, spot.Size, spot.Yaw, color);
+        }
     }
 
     static List<Chest> BuildChests(Transform parent)

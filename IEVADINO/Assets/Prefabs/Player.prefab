@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 3791479873848807975}
   - component: {fileID: 4412696818316792855}
   - component: {fileID: 3242027312839028379}
+  - component: {fileID: 6879085031020537214}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -222,6 +223,18 @@ MonoBehaviour:
   m_IgnoreFromBuild: 1
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffff
+--- !u!114 &6879085031020537214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 979036043906031061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b134f1ed702abd4a97bf5c61aa200d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor
 --- !u!1 &3313331552440948577
 GameObject:
   m_ObjectHideFlags: 0

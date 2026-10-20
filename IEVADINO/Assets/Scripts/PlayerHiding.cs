@@ -89,10 +89,4 @@ public class PlayerHiding : MonoBehaviour
         countdown = null;
         playerColor.ApplyColor(null);
     }
-
-    void OnGUI()
-    {
-        string state = IsHidden ? "Caché (" + Mathf.CeilToInt(TimeLeft) + " s)" : "Visible";
-        GUI.Label(new Rect(20, 50, 500, 30), state);
-    }
 }

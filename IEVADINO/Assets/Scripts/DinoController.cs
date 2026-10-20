@@ -19,6 +19,30 @@ public class DinoController : MonoBehaviour
 
     void OnEnable()
     {
+        WatchTarget();
+    }
+
+    void OnDisable()
+    {
+        UnwatchTarget();
+        StopChase();
+    }
+
+    public void SetTarget(Transform newTarget)
+    {
+        if (newTarget == Target) return;
+
+        if (isActiveAndEnabled)
+        {
+            UnwatchTarget();
+            StopChase();
+        }
+        Target = newTarget;
+        if (isActiveAndEnabled) WatchTarget();
+    }
+
+    void WatchTarget()
+    {
         if (Target == null) return;
 
         targetHiding = Target.GetComponent<PlayerHiding>();
@@ -32,13 +56,13 @@ public class DinoController : MonoBehaviour
         }
     }
 
-    void OnDisable()
+    void UnwatchTarget()
     {
         if (targetHiding != null)
         {
             targetHiding.OnHiddenChanged -= HandleTargetHidden;
         }
-        StopChase();
+        targetHiding = null;
     }
 
     void HandleTargetHidden(bool hidden)
