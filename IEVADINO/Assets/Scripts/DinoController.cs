@@ -1,51 +1,62 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class DinoController : MonoBehaviour
 {
+    public DinoSettings Settings;
     public Transform Target;
-    public float RepathInterval = 0.2f;
 
-    private NavMeshAgent navMeshAgent;
+    public NavMeshAgent Agent { get; private set; }
+    public bool TargetVisible { get; private set; }
+
+    private static readonly int TargetVisibleParameter = Animator.StringToHash("TargetVisible");
+    private static readonly int AttackParameter = Animator.StringToHash("Attack");
+
+    private Animator animator;
+    private DinoCatcher catcher;
     private Survivor targetSurvivor;
-    private Coroutine chase;
-    private Vector3 home;
 
     void Awake()
     {
-        navMeshAgent = GetComponent<NavMeshAgent>();
-        home = transform.position;
+        Agent = GetComponent<NavMeshAgent>();
+        animator = GetComponentInChildren<Animator>();
+        catcher = GetComponentInChildren<DinoCatcher>();
     }
 
     void OnEnable()
     {
         WatchTarget();
+        if (catcher != null) catcher.OnCatch += HandleCatch;
     }
 
     void OnDisable()
     {
         UnwatchTarget();
-        StopChase();
+        if (catcher != null) catcher.OnCatch -= HandleCatch;
+    }
+
+    void Start()
+    {
+        animator.SetBool(TargetVisibleParameter, TargetVisible);
     }
 
     public void SetTarget(Transform newTarget)
     {
         if (newTarget == Target) return;
 
-        if (isActiveAndEnabled)
-        {
-            UnwatchTarget();
-            StopChase();
-        }
+        if (isActiveAndEnabled) UnwatchTarget();
         Target = newTarget;
         if (isActiveAndEnabled) WatchTarget();
     }
 
     void WatchTarget()
     {
-        if (Target == null) return;
+        if (Target == null)
+        {
+            HandleTargetVisibility(false);
+            return;
+        }
 
         targetSurvivor = Target.GetComponent<Survivor>();
         if (targetSurvivor != null)
@@ -64,43 +75,14 @@ public class DinoController : MonoBehaviour
         targetSurvivor = null;
     }
 
-    // Cible perdue (cachée ou au refuge) : le dinosaure retourne à son point de départ.
     void HandleTargetVisibility(bool visible)
     {
-        if (visible)
-        {
-            StartChase();
-            return;
-        }
-        StopChase();
-        if (navMeshAgent.isActiveAndEnabled && navMeshAgent.isOnNavMesh) navMeshAgent.SetDestination(home);
+        TargetVisible = visible;
+        if (animator != null && animator.isInitialized) animator.SetBool(TargetVisibleParameter, visible);
     }
 
-    void StartChase()
+    void HandleCatch()
     {
-        if (chase == null) chase = StartCoroutine(Chase());
-    }
-
-    void StopChase()
-    {
-        if (chase != null)
-        {
-            StopCoroutine(chase);
-            chase = null;
-        }
-        if (navMeshAgent.isActiveAndEnabled && navMeshAgent.isOnNavMesh)
-        {
-            navMeshAgent.ResetPath();
-        }
-    }
-
-    IEnumerator Chase()
-    {
-        WaitForSeconds wait = new WaitForSeconds(RepathInterval);
-        while (true)
-        {
-            if (navMeshAgent.isOnNavMesh) navMeshAgent.SetDestination(Target.position);
-            yield return wait;
-        }
+        animator.SetTrigger(AttackParameter);
     }
 }

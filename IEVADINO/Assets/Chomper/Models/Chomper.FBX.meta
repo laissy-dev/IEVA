@@ -227,7 +227,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Chomper_Body_Mat
-    second: {fileID: 2100000, guid: 3981368b076803649b0fe975bbac9f61, type: 2}
+    second: {fileID: 2100000, guid: dad26cc8af5eca141b973d06942e6efb, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule

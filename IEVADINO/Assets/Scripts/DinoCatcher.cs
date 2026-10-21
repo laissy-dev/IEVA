@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -5,6 +6,8 @@ using UnityEngine.AI;
 public class DinoCatcher : MonoBehaviour
 {
     public float Reach = 0.6f;
+
+    public event Action OnCatch;
 
     void Awake()
     {
@@ -20,7 +23,6 @@ public class DinoCatcher : MonoBehaviour
         TryCatch(other);
     }
 
-    // Un survivant caché au contact est attrapé dès que son camouflage prend fin.
     void OnTriggerStay(Collider other)
     {
         TryCatch(other);
@@ -31,6 +33,9 @@ public class DinoCatcher : MonoBehaviour
         if (other.attachedRigidbody == null) return;
 
         ICatchable target = other.attachedRigidbody.GetComponent<ICatchable>();
-        if (target != null && target.CanBeCaught) target.Catch();
+        if (target == null || !target.CanBeCaught) return;
+
+        target.Catch();
+        OnCatch?.Invoke();
     }
 }
