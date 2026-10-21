@@ -12,8 +12,7 @@ public class GameManager : MonoBehaviour
 
     public event Action<int> OnFragmentCollected;
     public event Action OnVictory;
-
-    private string endMessage = "";
+    public event Action OnDefeat;
 
     void OnEnable()
     {
@@ -38,32 +37,29 @@ public class GameManager : MonoBehaviour
         CollectedFragments++;
         OnFragmentCollected?.Invoke(CollectedFragments);
 
-        if (CollectedFragments >= Rules.FragmentsToWin)
+        if (CollectedFragments >= Rules.FragmentsToWin && !IsOver)
         {
+            EndGame();
             OnVictory?.Invoke();
-            EndGame("Victoire ! Antidote reconstitué");
         }
     }
 
     void HandleAllCaught()
     {
-        EndGame("Défaite ! Tous les survivants ont été attrapés");
+        if (IsOver) return;
+
+        EndGame();
+        OnDefeat?.Invoke();
     }
 
-    void EndGame(string message)
+    void EndGame()
     {
-        if (IsOver) return;
         IsOver = true;
-        endMessage = message;
         Time.timeScale = 0.0f;
     }
 
     void OnGUI()
     {
         GUI.Label(new Rect(20, 80, 500, 30), "Fragments d'antidote : " + CollectedFragments + " / " + Rules.FragmentsToWin);
-        if (IsOver)
-        {
-            GUI.Label(new Rect(20, 110, 500, 30), endMessage);
-        }
     }
 }
