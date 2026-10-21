@@ -14,7 +14,6 @@ public class AntidoteFragment : MonoBehaviour
 
     private bool collected;
 
-    // Ramassable après un délai, sinon le joueur à côté du coffre le prendrait aussitôt.
     public void Reveal(Vector3 position)
     {
         transform.position = position;

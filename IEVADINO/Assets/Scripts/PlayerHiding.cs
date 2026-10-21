@@ -77,7 +77,6 @@ public class PlayerHiding : MonoBehaviour
         return false;
     }
 
-    // Le temps de camouflage ne s'écoule que lorsque le joueur est caché.
     IEnumerator Countdown()
     {
         while (TimeLeft > 0.0f)

@@ -9,7 +9,6 @@ public class PlayerColor : MonoBehaviour
 
     public event Action<ColorData> OnColorChanged;
 
-    // null = retour à la couleur neutre.
     public void ApplyColor(ColorData data)
     {
         Current = data;

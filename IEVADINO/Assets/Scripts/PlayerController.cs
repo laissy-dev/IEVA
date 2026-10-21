@@ -23,7 +23,6 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // transform est interpolé : la direction se lit sur la rotation du Rigidbody.
         Vector3 velocity = body.rotation * Vector3.forward * translationInput * speed;
         body.linearVelocity = new Vector3(velocity.x, body.linearVelocity.y, velocity.z);
 

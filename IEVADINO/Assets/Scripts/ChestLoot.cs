@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Cache chaque fragment dans un coffre différent, tiré au hasard à chaque partie.
 public class ChestLoot : MonoBehaviour
 {
     public Chest[] Chests;

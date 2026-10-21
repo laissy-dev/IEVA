@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 
-// Chaque question n'a qu'une réponse possible : « Oui ».
 public class NpcDialogue : MonoBehaviour, IInteractable
 {
     public DialogueData Dialogue;
@@ -52,7 +51,6 @@ public class NpcDialogue : MonoBehaviour, IInteractable
         OnAccepted?.Invoke(accepted);
     }
 
-    // Survivant attrapé ou changé avec Tab : son contrôle est déjà géré ailleurs.
     void HandleSpeakerDisabled()
     {
         Close(false);
