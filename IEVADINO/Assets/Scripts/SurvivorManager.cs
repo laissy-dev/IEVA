@@ -10,6 +10,7 @@ public class SurvivorManager : MonoBehaviour
     public int RemainingCount { get; private set; }
 
     public event Action<Survivor> OnActiveSurvivorChanged;
+    public event Action<Survivor> OnSwitchedByPlayer;
     public event Action OnAllCaught;
 
     void OnEnable()
@@ -40,31 +41,29 @@ public class SurvivorManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(SwitchKey)) SelectNext();
+        if (Input.GetKeyDown(SwitchKey) && SelectNext()) OnSwitchedByPlayer?.Invoke(Active);
     }
 
-    void SelectNext()
+    bool SelectNext()
     {
         int current = Array.IndexOf(Survivors, Active);
         for (int step = 1; step <= Survivors.Length; step++)
         {
             Survivor candidate = Survivors[(current + step) % Survivors.Length];
-            if (!candidate.IsCaught)
-            {
-                Select(candidate);
-                return;
-            }
+            if (!candidate.IsCaught) return Select(candidate);
         }
+        return false;
     }
 
-    void Select(Survivor survivor)
+    bool Select(Survivor survivor)
     {
-        if (survivor == Active) return;
+        if (survivor == Active) return false;
 
         if (Active != null) Active.SetControlled(false);
         Active = survivor;
         Active.SetControlled(true);
         OnActiveSurvivorChanged?.Invoke(Active);
+        return true;
     }
 
     void HandleCaught(Survivor survivor)

@@ -35,7 +35,7 @@ public class GameSounds : MonoBehaviour
         foreach (Survivor survivor in Survivors.Survivors) survivor.OnCaught += HandleCaught;
         foreach (Chest chest in Chests) chest.OnOpened += HandleChestOpened;
 
-        Survivors.OnActiveSurvivorChanged += HandleSwitched;
+        Survivors.OnSwitchedByPlayer += HandleSwitched;
         Game.OnFragmentCollected += HandleFragmentCollected;
         Game.OnVictory += HandleVictory;
         Game.OnDefeat += HandleDefeat;
@@ -47,7 +47,7 @@ public class GameSounds : MonoBehaviour
         foreach (Survivor survivor in Survivors.Survivors) survivor.OnCaught -= HandleCaught;
         foreach (Chest chest in Chests) chest.OnOpened -= HandleChestOpened;
 
-        Survivors.OnActiveSurvivorChanged -= HandleSwitched;
+        Survivors.OnSwitchedByPlayer -= HandleSwitched;
         Game.OnFragmentCollected -= HandleFragmentCollected;
         Game.OnVictory -= HandleVictory;
         Game.OnDefeat -= HandleDefeat;

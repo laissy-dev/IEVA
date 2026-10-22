@@ -309,11 +309,11 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 25
+  DopplerLevel: 0
+  MinDistance: 20
+  MaxDistance: 45
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -398,7 +398,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f8d1854cc754b04a35ea8d90e950eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DinoAnimationEvents
-  Steps: []
+  Steps:
+  - {fileID: 8300000, guid: f269f97c412c96f4582313dea2fd96e1, type: 3}
+  - {fileID: 8300000, guid: 44d7d91f9b95c0e46a7986073cddad25, type: 3}
+  - {fileID: 8300000, guid: 93413db87b9c0ab4c84ccfcbfdc8896d, type: 3}
+  - {fileID: 8300000, guid: f740a7b167ba1cd48b910662398f73c0, type: 3}
   Roar: {fileID: 0}
 --- !u!4 &545843009785463600 stripped
 Transform:
