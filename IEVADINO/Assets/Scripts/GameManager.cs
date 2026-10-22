@@ -6,9 +6,11 @@ public class GameManager : MonoBehaviour
     public GameRules Rules;
     public AntidoteFragment[] Fragments;
     public SurvivorManager Survivors;
+    public GameTimer Timer;
 
     public int CollectedFragments { get; private set; }
     public bool IsOver { get; private set; }
+    public bool TimedOut { get; private set; }
 
     public event Action<int> OnFragmentCollected;
     public event Action OnVictory;
@@ -21,6 +23,7 @@ public class GameManager : MonoBehaviour
             fragment.OnCollected += HandleFragmentCollected;
         }
         if (Survivors != null) Survivors.OnAllCaught += HandleAllCaught;
+        if (Timer != null) Timer.OnTimeUp += HandleTimeUp;
     }
 
     void OnDisable()
@@ -30,6 +33,7 @@ public class GameManager : MonoBehaviour
             fragment.OnCollected -= HandleFragmentCollected;
         }
         if (Survivors != null) Survivors.OnAllCaught -= HandleAllCaught;
+        if (Timer != null) Timer.OnTimeUp -= HandleTimeUp;
     }
 
     void HandleFragmentCollected(AntidoteFragment fragment)
@@ -48,6 +52,15 @@ public class GameManager : MonoBehaviour
     {
         if (IsOver) return;
 
+        EndGame();
+        OnDefeat?.Invoke();
+    }
+
+    void HandleTimeUp()
+    {
+        if (IsOver) return;
+
+        TimedOut = true;
         EndGame();
         OnDefeat?.Invoke();
     }

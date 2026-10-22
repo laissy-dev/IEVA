@@ -4,4 +4,5 @@ using UnityEngine;
 public class GameRules : ScriptableObject
 {
     public int FragmentsToWin = 3;
+    public int TimeLimit = 180;
 }

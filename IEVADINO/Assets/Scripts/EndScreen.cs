@@ -10,6 +10,7 @@ public class EndScreen : MonoBehaviour
 
     public string VictoryText = "Victoire ! L'antidote est reconstitué";
     public string DefeatText = "Extinction... Les survivants ont été dévorés";
+    public string TimeOutText = "Trop tard... L'antidote n'a pas été reconstitué à temps";
 
     void Awake()
     {
@@ -29,7 +30,7 @@ public class EndScreen : MonoBehaviour
     }
 
     void ShowVictory() => Show(VictoryText);
-    void ShowDefeat() => Show(DefeatText);
+    void ShowDefeat() => Show(Game.TimedOut ? TimeOutText : DefeatText);
 
     void Show(string text)
     {

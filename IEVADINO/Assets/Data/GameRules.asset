@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: GameRules
   m_EditorClassIdentifier: Assembly-CSharp::GameRules
   FragmentsToWin: 3
+  TimeLimit: 180

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class AliveIdle : MonoBehaviour
 {
-    public enum Mode { Flotter, Respirer, Balancer, Tourner }
+    public enum Mode { Flotter, Respirer, Balancer, Tourner, Vent }
 
     public Mode Style = Mode.Respirer;
     public float Amplitude = 1.0f;
@@ -40,6 +40,12 @@ public class AliveIdle : MonoBehaviour
                 break;
             case Mode.Tourner:
                 transform.localRotation = baseRotation * Quaternion.Euler(0.0f, time * 60.0f * Amplitude, 0.0f);
+                break;
+            case Mode.Vent:
+                // Rafales irrégulières décalées selon la position : la vague de vent traverse la forêt.
+                Vector3 p = transform.position;
+                float gust = Mathf.PerlinNoise(Time.time * Speed * 0.3f + p.x * 0.05f, p.z * 0.05f);
+                transform.localRotation = baseRotation * Quaternion.Euler(gust * 8.0f * Amplitude, 0.0f, wave * 1.5f * Amplitude);
                 break;
         }
     }

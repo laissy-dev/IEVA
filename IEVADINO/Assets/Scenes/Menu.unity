@@ -465,8 +465,9 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "Cinq survivants, un dinosaure, un antidote \xE0 reconstituer.\nTrouvez
-    les 3 fragments pour gagner.\nPour ouvrir un coffre, assurez-vous de matcher
-    la couleur de la zone.\nSurtout ne laissez pas le dinosaure vous manger !"
+    les 3 fragments en moins de 3 minutes pour gagner.\nPour ouvrir un coffre, assurez-vous
+    de matcher la couleur de la zone.\nSurtout ne laissez pas le dinosaure vous manger
+    !"
 --- !u!222 &544350016
 CanvasRenderer:
   m_ObjectHideFlags: 0
