@@ -42,14 +42,17 @@ Cinq survivants partent d'un refuge pour reconstituer l'antidote qui sauvera l'h
 - Organisation finale du projet : scènes `Menu` et `Jeu`, prefabs `Dino` et `Peintre`
 
 **Alexandre**
-- Création du projet Unity commun, du dépôt GitHub, du README et du Gantt
+- Création du projet Unity commun, du dépôt GitHub, du README, du Gantt et des captures d'évolution
 - Contrôleur du joueur repris du TP, puis passé en physique (Rigidbody, `FixedUpdate`), flèche de direction
-- Premier dinosaure avec NavMesh, puis attrape des survivants et défaite (`DinoCatcher`)
+- Premier dinosaure avec NavMesh, fusion des deux parties du projet
 - Refactorisation en composants, événements et ScriptableObjects (`ColorData`, `GameRules`, `IInteractable`, `Interactor`)
-- Construction de la carte (murs, obstacles, refuge et passerelle) et coffres contenant les fragments d'antidote (`Chest`, `ChestLoot`, `AntidoteFragment`, `SafeZone`)
+- Logique de la partie (`GameManager`) : victoire (premier antidote, puis 3 fragments), défaite quand les 5 survivants sont attrapés (`DinoCatcher`) ou quand le temps est écoulé
+- Chrono de 3 minutes et son panneau dans l'arène (`GameTimer`, `TimerBoard`)
+- Construction de la carte (murs, obstacles, refuge et passerelle) et coffres contenant les fragments d'antidote (`Chest`, `ChestLoot`, `AntidoteFragment`)
+- Refuge sûr et visibilité des survivants : le dinosaure abandonne une cible cachée ou au refuge (`SafeZone`, `Survivor`, `DinoController`)
 - Dialogues « Oui » des peintres (`NpcDialogue`, `DialogueData`) et coffres verrouillés par couleur
 - Éclairage statique et dynamique (lightmaps, light probes), prefabs du décor et des zones, vent dans les arbres
-- Chrono de 3 minutes (`GameTimer`, `TimerBoard`), builds Windows
+- Builds Windows
 
 **Ensemble** : choix du concept et du gameplay, fusion des deux parties, tests et équilibrage.
 
