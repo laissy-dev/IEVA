@@ -1,5 +1,7 @@
 # Extinction — projet IEVA (groupe 6 : Kenan & Alexandre)
 
+- Illustration draw.io 7 octobre 2026:
+
 ![](IEVA.png)
 
 - **Thème** : GGJ 2011 « Extinction »
@@ -24,15 +26,16 @@ Cinq survivants partent d'un refuge pour reconstituer l'antidote qui sauvera l'h
 - **Exécutable** : lancer `Build/IEVADINO.exe` fourni dans le ZIP (Windows).
 - **Projet** : ouvrir le dossier `IEVADINO` avec **Unity 6000.3.24f1**, ouvrir la scène `Assets/Scenes/Menu.unity`, puis Play.
 
-| Action | Touche |
-|---|---|
-| Avancer / reculer, tourner | Flèches directionnelles |
-| Changer de survivant | `Tab` |
-| Parler à un peintre, répondre « Oui », ouvrir un coffre | `E` |
+| Action                                                  | Touche                  |
+| ------------------------------------------------------- | ----------------------- |
+| Avancer / reculer, tourner                              | Flèches directionnelles |
+| Changer de survivant                                    | `Tab`                   |
+| Parler à un peintre, répondre « Oui », ouvrir un coffre | `E`                     |
 
 ## Qui a fait quoi
 
 **Kenan**
+
 - Prise de couleur : lecture du RGB d'un material, interaction avec la touche E, couleur appliquée au personnage (`ColorSource`, `ColorInteraction`, `PlayerColor`)
 - Dinosaure Chomper : intégration du modèle du TP et passage des materials en URP
 - Zones de couleur et camouflage de 20 s (`PlayerHiding`)
@@ -42,6 +45,7 @@ Cinq survivants partent d'un refuge pour reconstituer l'antidote qui sauvera l'h
 - Organisation finale du projet : scènes `Menu` et `Jeu`, prefabs `Dino` et `Peintre`
 
 **Alexandre**
+
 - Création du projet Unity commun, du dépôt GitHub, du README, du Gantt et des captures d'évolution
 - Contrôleur du joueur repris du TP, puis passé en physique (Rigidbody, `FixedUpdate`), flèche de direction
 - Premier dinosaure avec NavMesh, fusion des deux parties du projet
@@ -80,16 +84,16 @@ Cinq survivants partent d'un refuge pour reconstituer l'antidote qui sauvera l'h
 
 ### Architecture
 
-| Élément | Composants |
-|---|---|
-| Survivant (prefab `Player`) | `PlayerController`, `PlayerColor`, `PlayerHiding`, `Interactor`, `Survivor` (`ICatchable`) |
-| Survivants | `SurvivorManager`, `SurvivorHud`, `CameraFollow`, `SafeZone` |
-| Couleurs (prefab `ZoneCouleur`) | `ColorData`, `ColorSource`, `ColorZone`, `ColorInteraction`, `TriggerSet` |
-| Peintre (prefab `Peintre`) | `NpcDialogue` (`IInteractable`), `DialogueData`, `ColorInteraction`, `AliveIdle` |
-| Dinosaure (prefab `Dino`) | `DinoController` + Animator `Dino.controller` (`DinoPatrolState`, `DinoChaseState`, `DinoAttackState`), `DinoSettings`, `DinoCatcher`, `DinoFollowActiveSurvivor`, `DinoAnimationEvents` |
-| Coffres et fragments (prefabs `Coffre`, `FragmentAntidote`) | `Chest` (`IInteractable`), `ChestLoot`, `AntidoteFragment` |
-| Décor (prefabs `Arbre`, `Buisson`) | `AliveIdle` (vent, respiration) |
-| Partie | `GameManager`, `GameRules`, `GameTimer`, `TimerBoard`, `EndScreen`, `MainMenu`, `GameSounds` |
+| Élément                                                     | Composants                                                                                                                                                                               |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Survivant (prefab `Player`)                                 | `PlayerController`, `PlayerColor`, `PlayerHiding`, `Interactor`, `Survivor` (`ICatchable`)                                                                                               |
+| Survivants                                                  | `SurvivorManager`, `SurvivorHud`, `CameraFollow`, `SafeZone`                                                                                                                             |
+| Couleurs (prefab `ZoneCouleur`)                             | `ColorData`, `ColorSource`, `ColorZone`, `ColorInteraction`, `TriggerSet`                                                                                                                |
+| Peintre (prefab `Peintre`)                                  | `NpcDialogue` (`IInteractable`), `DialogueData`, `ColorInteraction`, `AliveIdle`                                                                                                         |
+| Dinosaure (prefab `Dino`)                                   | `DinoController` + Animator `Dino.controller` (`DinoPatrolState`, `DinoChaseState`, `DinoAttackState`), `DinoSettings`, `DinoCatcher`, `DinoFollowActiveSurvivor`, `DinoAnimationEvents` |
+| Coffres et fragments (prefabs `Coffre`, `FragmentAntidote`) | `Chest` (`IInteractable`), `ChestLoot`, `AntidoteFragment`                                                                                                                               |
+| Décor (prefabs `Arbre`, `Buisson`)                          | `AliveIdle` (vent, respiration)                                                                                                                                                          |
+| Partie                                                      | `GameManager`, `GameRules`, `GameTimer`, `TimerBoard`, `EndScreen`, `MainMenu`, `GameSounds`                                                                                             |
 
 ## Évolution du projet
 
@@ -122,7 +126,7 @@ Captures prises au fil du développement (dossier `EvolutionScreenshots`).
 ## Crédits audio (CC0)
 
 - Effets sonores : [Kenney](https://kenney.nl) — Interface Sounds, Impact Sounds, Music Jingles
-- Musiques : SRG774 — [Dark Sci-Fi Audio Pack](https://opengameart.org/content/dark-sci-fi-audio-pack)
+- Musiques : SRG774 — [Dark Sci-Fi Audio Pack](https://opengameart.org/content/dark-sci-fi-audio-pack) et Jurassic park remix [Jurassic Park Remix ◕ ◡ ◕ - YouTube](https://www.youtube.com/watch?v=LJwVsxmwG_g)
 
 ## Planning
 
